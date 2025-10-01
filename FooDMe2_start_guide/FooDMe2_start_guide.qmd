@@ -177,22 +177,39 @@ When you are done, configure the channels as above. You will need to close you s
 
 ### Nextflow configuration
 
-In order to set some of the execution options for nextflow, like ressource allocation, dependency manager, or where to look for the locally installed databases, it is possible to configure Nextflow using one of two options:
+In order to set some of the execution options for nextflow, like ressource allocation, dependency manager, or where to look for the locally installed databases, it is possible to configure Nextflow using one of tthe options:
 
 - remote configuration (recommended) on the central `bio-raum/nf-configs` [github repository](https://github.com/bio-raum/nf-configs/tree/main), allows to fully pre-configure FooDMe2 in a way that is specific to your setting with a single `switch`.
 - alternatively, one can use a local configuration file, although this limits the scope of possible configurations.
 - no configuration (not recommended) is also possible, but you will have to manually provide parameters at each execution.
 
+::: {.callout-note}
+Setting up a remote profile can take a little bit of time. If possible, plan ahead or use an alternative method in the meantime.
+:::
+
 A few examples are given below; these can be extended as described in the [Nextflow documentation](https://www.nextflow.io/docs/latest/config.html#configuration-file).
+
+::: {.callout-warning title="Distributed compute infrastructures"}
+All examples below assume that you run FooDMe2 on a local system (`executor = local`). 
+If you are planning to use this pipeline on a distributed compute system ("cluster"), or the cloud, 
+please refer to the [Nextflow documentation](https://www.nextflow.io/docs/latest/executor.html) to learn about alternative execution profiles. 
+An example for a Slurm cluster can be found [here](https://github.com/bio-raum/nf-configs/blob/main/conf/lsh.config).
+:::
 
 :::: {.panel-tabset group="config"}
 ## Remote
 
-To upload your own configuration to the central `bio-raum/nf-configs` repository, [open an issue](https://github.com/bio-raum/nf-configs/issues/new) or directly send a pull-request. Alternatively, you can use on of the existing configuration if it fits your needs.
+To upload your own configuration to the central `bio-raum/nf-configs` repository, [open an issue](https://github.com/bio-raum/nf-configs/issues/new) 
+with your planned configuration or directly send a pull-request. Alternatively, you can use on of the existing configuration if it fits your needs.
 
-Before using the examples below, make sure you modify the ressources (`max_cpus` and `max_memory`) so that they fit your system, and adjust the paths that will be used to store the databases and dependencies on your system (`reference_base` and `cacheDir`).
-If you run on a local system with a single user, you may install the references into your home directory ($HOME, /home/youruser). In a shared setting, particularly on distributed compute infrastructures, the references should be installed
+::: {.callout-tip}
+Before using the examples below, make sure you modify the ressources (`max_cpus` and `max_memory`) so that they fit your system, 
+and adjust the paths that will be used to store the databases and dependencies on your system (`reference_base` and `cacheDir`).
+
+If you run on a local system with a single user, you may install the references into your home directory 
+(`$HOME`, `/home/youruser`). In a shared setting, particularly on distributed compute infrastructures, the references should be installed
 to a shared directory where all users can access them. 
+:::
 
 ::: {.panel-tabset group="depmanager"}
 
@@ -293,7 +310,16 @@ conda {
 
 ## Local
 
-For the following it will be assumed that the configuration file is saved under `$HOME/nextflow` as `local.config`
+For the following it will be assumed that the configuration file is saved under `$HOME/nextflow` as `local.config`.
+
+::: {.callout-tip}
+Before using the examples below, make sure you modify the ressources (`max_cpus` and `max_memory`) so that they fit your system, 
+and adjust the paths that will be used to store the dependencies on your system (`cacheDir`).
+
+If you run on a local system with a single user, you may install the references into your home directory 
+(`$HOME`, `/home/youruser`). In a shared setting, particularly on distributed compute infrastructures, the references should be installed
+to a shared directory where all users can access them. 
+:::
 
 ::: {.panel-tabset group="depmanager"}
 
@@ -390,14 +416,16 @@ conda {
 
 ::::
 
-### Distributed compute infrastructures
-
-All examples assume that you run FooDMe2 on a local system (executor = local). If you are planning to use this pipeline on a distributed compute system ("cluster"), or the cloud, please refer to the [Nextflow documentation](https://www.nextflow.io/docs/latest/executor.html) to learn about alternative execution profiles. 
-An example for a Slurm cluster can be found [here](https://github.com/bio-raum/nf-configs/blob/main/conf/lsh.config).
-
 ### Installing the databases
 
 Now that everything is installed and Nextflow is configured, we can install the databases that will be used for the analysis.
+Several different databases for different sources such as [NCBI](https://ftp.ncbi.nlm.nih.gov/refseq/), [MIDORI](https://www.reference-midori.info/),
+or [UNITE](https://unite.ut.ee/) can be installed automatically and used in a standardized way by FooDMe2. You can also provide your own dataases.
+
+::: {.callout-note}
+You will see several parameters used in the commands below that are not immediatly important.
+These will be explained further in tis document or you can check them up in the online documentation.
+:::
 
 ::: {.panel-tabset group="config"}
 
@@ -406,7 +434,7 @@ Now that everything is installed and Nextflow is configured, we can install the 
 ```bash
 nextflow run bio-raum/FooDMe2 \
   -profile remote \                         # <1>
-  -r main \
+  -r 1.3.0 \
   --build_references \
   --run_name build \
   --skip_genbank                            # <2>
@@ -420,26 +448,24 @@ nextflow run bio-raum/FooDMe2 \
 ```bash
 nextflow run bio-raum/FooDMe2 \
   -c $HOME/nextflow/local.config \          # <1>
-  -r main \
+  -r 1.3.0 \
   --build_references \
   --reference_base $HOME/nextflow/refs \    # <2>
   --run_name build \
   --skip_genbank                            # <3>
 ```
 1. This should be the path to your local configuration file
-2. This is the path to the folder to which the databses will be downloaded.
+2. This is the path to the folder to which the databases will be downloaded.
 3. The Genbank core database can be installed by omitting this line, note that this will take up several hundred Gb and may require a substantial amount of RAM to use.
 
 :::
 
-The `$HOME/nextflow/refs` folder should now contain a folder called `foodme2` that itself contains several versioned databases.
+After the command above ran, the `$HOME/nextflow/refs` folder should contain a folder called `foodme2` that itself contains several versioned databases.
 
 ### Testing the installation
 
 When the database installation is finished, it is time for the last installation step before we dive in the analysis: testing the workflow.
-Using the `test` profile as below will download a couple of sequencing data from ENA and run a standard workflow on them.
-
-Don't worry about the parameters used here yet, we will go over it in a moment.
+Using the `test` profile as below will download a couple of sequencing data from ENA and run a standard analysis workflow on them.
 
 ::: {.panel-tabset group="config"}
 
@@ -448,7 +474,7 @@ Don't worry about the parameters used here yet, we will go over it in a moment.
 ```bash
 nextflow run bio-raum/FooDMe2 \
   -profile remote,test \                    # <1>
-  -r main \
+  -r 1.3.0 \
   --run_name test
 ```
 1. `remote` is the name of your file in the `bio-raum/nf-configs` repository, without the `.config` extension.
@@ -459,22 +485,25 @@ nextflow run bio-raum/FooDMe2 \
 nextflow run bio-raum/FooDMe2 \
   -profile test
   -c $HOME/nextflow/local.config \          # <1>
-  -r main \
+  -r 1.3.0 \
   --reference_base $HOME/nextflow/refs \    # <2>
   --run_name test
 ```
 1. This should be the path to your local configuration file
-2. This is the path to the folder to which the databses will be downloaded.
+2. This is the path to the folder to which the databases were downloaded.
 
 :::
 
 Nextflow should keep you informed of what is happening and after the workflow completed, you can check the `results` folder of
 the current working directory to have a look at the results.
 
+::: {.callout-tip}
 Congrats! We are done with the installation, and hopefully everything looks good.
-The `results/reports` folder in particular contains the analysis result and useful QC metrics to evaluate your samples.
+Be sure to check the `results/reports` folder in particular contains the analysis result and useful QC metrics to evaluate your samples.
 If you encountered an Error, check if you scuccesfully performed all the steps above.
-Feel free to get in [touch for help troobleshooting](https://github.com/bio-raum/FooDMe2/issues/new?template=QUESTION.yml) or to [report a problem](https://github.com/bio-raum/FooDMe2/issues/new?template=BUG-REPORT.yml).
+Feel free to get in [touch for help troobleshooting](https://github.com/bio-raum/FooDMe2/issues/new?template=QUESTION.yml) 
+or to [report a problem](https://github.com/bio-raum/FooDMe2/issues/new?template=BUG-REPORT.yml).
+:::
 
 ## Workflow management
 The next steps will push further into real-life usage. But first let's take a short break to talk about a few important features of Nextflow.
