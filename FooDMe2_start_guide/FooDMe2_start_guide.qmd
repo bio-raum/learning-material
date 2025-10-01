@@ -1,6 +1,6 @@
 ---
 title: "FooDMe2 installation guide"
-subtitle: "A step-by-step guide for FooDMe2 v1.1.0"
+subtitle: "A step-by-step guide for FooDMe2 v1.3.0"
 author:
   - name: G. Denay
     affiliation: CVUA-RRW
@@ -45,7 +45,7 @@ website:
 to render this document use:
 ```
 quarto install extension shafayetShafee/bsicons
-quarto render <filename>
+quarto render FooDMe2_start_guide.qmd
 ```
 -->
 
