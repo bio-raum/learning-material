@@ -1,6 +1,6 @@
 ---
 title: "FooDMe2 installation guide"
-subtitle: "A step-by-step guide for FooDMe2 v1.3.0"
+subtitle: "A step-by-step guide for FooDMe2 v1.3"
 author:
   - name: G. Denay
     affiliation: CVUA-RRW
@@ -13,6 +13,9 @@ title-block-banner-color: white
 format:
   html:
     theme: lumen
+    grid:
+      body-width: 1050px
+      margin-width: 0px
     embed-resources: true
     anchor-sections: true
     smooth-scroll: true
@@ -49,20 +52,35 @@ quarto render FooDMe2_start_guide.qmd
 ```
 -->
 
-This document aims to be a step-by-step handy guide to your first installation, configuration, and usage of FooDMe2.
+## Forword
+
+This document aims to be a step-by-step handy guide to your first installation, configuration, and usage of FooDMe2. It does not replace the 
+workflow documentation taht can be found following the link in the left navigation panel. Following this guide alone will only bring you as far
+as setting up FooDMe2 for basic analyses on your system, do read the documentation to know how to properly use the workflow!
 
 You can copy the code from each block and paste it in your shell to follow along. Hover over the circled numbers in the
-code blocks to know more.
+code blocks to know more. You can also check the links to jump to the relevant documentation section.
+
+Should anything be unclear or not work as expected, we ask for your understanding, maintaining this guide along the pipeline is considerable work
+and we may have forgotten something, or some information may be outdated. Please tell us about it by submitting an issue in the FooDMe2 Github repository.
 
 ## Requirements
 
 To follow along you will need:
 
 - A UNIX system: any Linux distribution, MacOS, or Windows Subsystem for Linux.
-- An Internet connection. If nescessary, the proxy settings.
-- For the installation of Nextflow (compulsary) and Docker or Singularity/Apptainer (optional), you will need root (`sudo`) access.
+- An working Internet connection, depending on your local setup the proxy settings.
+- For the installation of Nextflow (compulsary) and Docker or Singularity/Apptainer (optional), you may need root (`sudo`) access.
 
-We assume basic knowledge of the UNIX shell and the examples used will rely solely on the analysis of paired-end illumina data of meat (mammals and birds) samples.
+We assume basic knowledge of the UNIX shell and the examples used will rely solely on the analysis of paired-end 
+illumina data of meat (mammals and birds) samples as a practical example.
+
+::: {.callout-note}
+We provide some degree of explanations for the installation of Nextflow and dependency managers here, 
+but we provide only very limited support for these.
+If you experience problems with the installation of nextflow and/or depedency managers, you should get in touch with your system 
+administrator or IT support. 
+:::
 
 ## Installation
 
@@ -76,21 +94,29 @@ First check wether nextflow is installed on your system:
 nextflow info
 ```
 
-If the nextflow version is 23 or more, you are good to go!
 
-If nextflow is installed with an older version run:
+FooDMe should run with nextflow $\geq$ 24.10.5. If nextflow is installed with an older version run:
 
 ```bash
 nextflow self-update
 ```
 
-If nextflow is not installed, you will need to follow the [step-by-step instructions from the Nextflow documentation](https://www.nextflow.io/docs/latest/install.html#requirements)
+If nextflow is not installed, you will need to follow the [step-by-step instructions from the Nextflow documentation](https://www.nextflow.io/docs/latest/install.html#requirements). Note that you might need `sudo` rights!
 
 ### Dependency managers
 
 Nexflow relies on dependency managers for the deployement of software dependencies in self contained environments or containers.
-We always recommend that you run FooDMe2 with a container engine, such as [Docker](https://www.docker.com/), [Apptainer](https://apptainer.org/) or [Singularity](https://docs.sylabs.io/guides/latest/user-guide/index.html). Containers are faster to install and a more reliable way to ensure pipeline reproducibility over time. If containers
-are not an option in your setting, you can also use the Conda/Mamba package manager. 
+We always recommend that you run FooDMe2 with a container engine, such as **[Apptainer](https://apptainer.org/)**,
+[Singularity](https://docs.sylabs.io/guides/latest/user-guide/index.html), or [Docker](https://www.docker.com/). 
+Containers are faster to install and a more reliable way to ensure pipeline reproducibility over time. If containers
+are not an option in your settings or you are experiencing troubles getting them to work, you can also use the Conda/Mamba package manager.
+
+::: {.callout-warning}
+Conda environments, though usually easy to deploy are not guaranteed to reproducibly install all dependencies in the same versions.
+For this reason we recommend that FooDMe2 be run with a container-based manager such as Apptainer/Singularity or Docker.
+
+For a discussion on conda reproducibility, see [PMID29953862](https://pubmed.ncbi.nlm.nih.gov/29953862/).
+:::
 
 ::: {.panel-tabset group="depmanager"}
 
@@ -99,27 +125,27 @@ are not an option in your setting, you can also use the Conda/Mamba package mana
 Check if installed:
 
 ```bash
-apptainer -help
+apptainer version
 ```
 
-If it is not installed, check the [official installation guide](https://apptainer.org/docs/admin/latest/installation.html#install-from-pre-built-packages), or choose another manager.
+If it is not installed, check the [official installation guide](https://apptainer.org/docs/admin/latest/installation.html#install-from-pre-built-packages), or choose another dependency manager.
 
 ## Singularity
 
 Check if installed:
 
 ```bash
-singularity -help
+singularity version
 ```
 
-If it is not installed, check the [official installation guide](https://docs.sylabs.io/guides/latest/user-guide/quick_start.html#download-singularityce-from-a-release), or choose another manager.
+If it is not installed, check the [official installation guide](https://docs.sylabs.io/guides/latest/user-guide/quick_start.html#download-singularityce-from-a-release), or choose another dependency manager.
 
 ## Docker
 
 Check if installed:
 
 ```bash
-docker -help
+docker version
 ```
 
 Ensure that your user is part of the Docker group ('docker'), or that Docker is otherwise configured to allow you to execute it.
@@ -134,7 +160,9 @@ Check if installed:
 conda info
 ```
 
-If it is, great! Make sure it is configured properly to find and installe the packages:
+If it is, great! Make sure it is configured properly to find and install the required packages. The `conda-forge` channel should be on top of 
+the channel list, followed by `bioconda` and channel priority should be set to `strict`.
+If it is not the case you can run:
 
 ```bash
 conda config --add channels bioconda
