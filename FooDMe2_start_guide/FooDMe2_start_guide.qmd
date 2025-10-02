@@ -177,7 +177,7 @@ When you are done, configure the channels as above. You will need to close you s
 
 ## Nextflow configuration
 
-In order to set some of the execution options for nextflow, like ressource allocation, dependency manager, or where to look for the locally installed databases, it is possible to configure Nextflow using one of tthe options:
+In order to set some of the execution options for nextflow, like ressource allocation, dependency manager, or where to look for the locally installed databases, it is possible to configure Nextflow using one of these options:
 
 - remote configuration (recommended) on the central `bio-raum/nf-configs` [github repository](https://github.com/bio-raum/nf-configs/tree/main), allows to fully pre-configure FooDMe2 in a way that is specific to your setting with a single `switch`.
 - alternatively, one can use a local configuration file, although this limits the scope of possible configurations.
@@ -203,7 +203,7 @@ To upload your own configuration to the central `bio-raum/nf-configs` repository
 with your planned configuration or directly send a pull-request. Alternatively, you can use on of the existing configuration if it fits your needs.
 
 ::: {.callout-warning}
-Before using the examples below, make sure you modify the ressources (`max_cpus` and `max_memory`) so that they fit your system, 
+Before using the examples below, make sure you set the resource limits of your compute environment (for example: 8 CPU cores, 30 Gb of Ram), 
 and adjust the paths that will be used to store the databases and dependencies on your system (`reference_base` and `cacheDir`).
 
 If you run on a local system with a single user, you may install the references into your home directory 
@@ -217,13 +217,13 @@ to a shared directory where all users can access them.
 
 ```{.js filename="remote.config"}
 params {
-	max_cpus = 10
-	max_memory = 64.GB
+
 	reference_base = "$HOME/nextflow/refs"
 }
 
 process {
 	executor = 'local'
+	resourceLimits = [ cpus: 8, memory: 30.GB, time: 72.h ]
 }
 
 executor {
@@ -240,13 +240,12 @@ apptainer {
 
 ```{.js filename="remote.config"}
 params {
-	max_cpus = 10
-	max_memory = 64.GB
 	reference_base = "$HOME/nextflow/refs"
 }
 
 process {
 	executor = 'local'
+	resourceLimits = [ cpus: 8, memory: 30.GB, time: 72.h ]
 }
 
 executor {
@@ -263,13 +262,12 @@ singularity {
 
 ```{.js filename="remote.config"}
 params {
-	max_cpus = 10
-	max_memory = 64.GB
 	reference_base = "$HOME/nextflow/refs"
 }
 
 process {
 	executor = 'local'
+	resourceLimits = [ cpus: 8, memory: 30.GB, time: 72.h ]
 }
 
 executor {
@@ -286,13 +284,12 @@ docker {
 
 ```{.js filename="remote.config"}
 params {
-	max_cpus = 10
-	max_memory = 64.GB
 	reference_base = "$HOME/nextflow/refs"
 }
 
 process {
 	executor = 'local'
+	resourceLimits = [ cpus: 8, memory: 30.GB, time: 72.h ]
 }
 
 executor {
@@ -326,13 +323,14 @@ to a shared directory where all users can access them.
 ### Apptainer
 
 ```{.js filename="local.config"}
+
 params {
-	max_cpus = 10
-	max_memory = 64.GB
+	reference_base = "$HOME/nextflow/refs"
 }
 
 process {
 	executor = 'local'
+	resourceLimits = [ cpus: 8, memory: 30.GB, time: 72.h ]
 }
 
 executor {
@@ -348,13 +346,14 @@ apptainer {
 ### Singularity
 
 ```{.js filename="local.config"}
+
 params {
-	max_cpus = 10
-	max_memory = 64.GB
+	reference_base = "$HOME/nextflow/refs"
 }
 
 process {
 	executor = 'local'
+	resourceLimits = [ cpus: 8, memory: 30.GB, time: 72.h ]
 }
 
 executor {
@@ -371,12 +370,13 @@ singularity {
 
 ```{.js filename="local.config"}
 params {
-	max_cpus = 10
-	max_memory = 64.GB
+	reference_base = "$HOME/nextflow/refs"
 }
 
 process {
 	executor = 'local'
+	resourceLimits = [ cpus: 8, memory: 30.GB, time: 72.h ]
+
 }
 
 executor {
@@ -393,12 +393,12 @@ docker {
 
 ```{.js filename="local.config"}
 params {
-	max_cpus = 10
-	max_memory = 64.GB
+	reference_base = "$HOME/nextflow/refs"
 }
 
 process {
 	executor = 'local'
+	resourceLimits = [ cpus: 8, memory: 30.GB, time: 72.h ]
 }
 
 executor {
@@ -546,7 +546,7 @@ FooDMe2 is semantically versioned, using a **MAJOR.MINOR.PATCH** model where:
 
 - **MAJOR** is a major version, possibly introducing breaking changes
 - **MINOR** is a minor version, introducing changes in workflows that are backwards compatible
-- **PATCH** is mainly used for bugfix and documentation
+- **PATCH** is mainly used for bugfixes and documentation
 
 Each new **MAJOR** or **MINOR** release requires a re-verification of the analytics. **MAJOR** changes can potentially require a re-validation.
 
@@ -611,7 +611,7 @@ nextflow run bio-raum/FooDMe2 \
   -r 1.3.0 \                                              # <2>
   --run_name first_run \                                  # <3>
   --input $HOME/metabarcoding/rawdata/samples.tsv \       # <4>
-  --primer_set amniotes_dobrovolny                        # <5>
+  --primer_set 16S_ILM_ASU184_meat                        # <5>
 ```
 1. `remote` is the name of your file in the `bio-raum/nf-configs` repository, without the `.config` extension.
 2. Specifies the version of the FooDMe2 workflow to use.
@@ -627,7 +627,7 @@ nextflow run bio-raum/FooDMe2 \
   -r 1.3.0 \                                                      # <2>
   --run_name first_run \                                          # <3>
   --reads '/home/user/metabarcoding/rawdata/*_R{1,2}.fastq.gz' \  # <4>
-  --primer_set amniotes_dobrovolny                                # <5>
+  --primer_set 16S_ILM_ASU184_meat                                # <5>
 ```
 1. `remote` is the name of your file in the `bio-raum/nf-configs` repository, without the `.config` extension.
 2. Specifies the version of the FooDMe2 workflow to use.
@@ -648,7 +648,7 @@ nextflow run bio-raum/FooDMe2 \
   -r 1.3.0 \                                              # <2>
   --run_name first_run \                                  # <3>
   --input $HOME/metabarcoding/rawdata/samples.tsv \       # <4>
-  --primer_set amniotes_dobrovolny \                      # <5>
+  --primer_set 16S_ILM_ASU184_meat \                      # <5>
   --reference_base $HOME/nextflow/refs                    # <6>
 ```
 1. Path to your local configuration file.
@@ -666,7 +666,7 @@ nextflow run bio-raum/FooDMe2 \
   -r 1.3.0 \                                                      # <2>
   --run_name first_run \                                          # <3>
   --reads '/home/user/metabarcoding/rawdata/*_R{1,2}.fastq.gz' \  # <4>
-  --primer_set amniotes_dobrovolny \                              # <5>
+  --primer_set 16S_ILM_ASU184_meat \                              # <5>
   --reference_base $HOME/nextflow/refs                            # <6>
 ```
 1. Path to your local configuration file.
@@ -844,7 +844,7 @@ nextflow run bio-raum/FooDMe2 \
   -r $VERSION \
   --run_name ${run_id}_${run_name} \
   --input $HOME/metabarcoding/rawdata/samples.tsv \
-  --primer_set amniotes_dobrovolny \
+  --primer_set 16S_ILM_ASU184_meat \
   --outdir $HOME/metabarcoding/results/${run_id}_${run_name} \
   && mv $HOME/metabarcoding/rawdata/* $HOME/metabarcoding/archive/${run_id}_${run_name} \  # <4>
   && nextflow clean  # <5>
@@ -884,7 +884,7 @@ nextflow run bio-raum/FooDMe2 \
   -r $VERSION \
   --run_name ${run_id}_${run_name} \
   --input $HOME/metabarcoding/rawdata/samples.tsv \
-  --primer_set amniotes_dobrovolny \
+  --primer_set 16S_ILM_ASU184_meat \
   --reference_base $HOME/nextflow/refs \
   --outdir $HOME/metabarcoding/results/${run_id}_${run_name} \
   && mv $HOME/metabarcoding/rawdata/* $HOME/metabarcoding/archive/${run_id}_${run_name} \  # <3>
@@ -909,7 +909,7 @@ bash $HOME/metabarcoding/scripts/run_foodme2.sh run_name  # <2>
 ## Validation
 
 Like we saw for the test, FooDMe2 packs a profile for quick validation of the mammals and birds methods.
-Details of the execution and results can be found in the [online documentation](https://bio-raum.github.io/FooDMe2/latest/methods/amniotes_dobrovolny/).
+Details of the execution and results can be found in the [online documentation](https://bio-raum.github.io/FooDMe2/latest/methods/16S_ILM_ASU184_meat/).
 
 The validation can be executed with:
 
@@ -939,7 +939,7 @@ nextflow run bio-raum/FooDMe2 \
 
 :::
 
-This will trigger the download of the dataset from the ENA and run FooDMe2 with the `amniotes_dobrovolny` primer sets configuration.
+This will trigger the download of the dataset from the ENA and run FooDMe2 with the `16S_ILM_ASU184_meat` primer sets configuration.
 In addtion to normal runs, a confusion matrix will be produced, allowing to calculate metrics on precision and accuracy for the analysis.
 
 It is possible that the connection with ENA breaks down, blocking the execution of the workflow. If restarting the command doesnÄt work, try to download the dataset
@@ -964,7 +964,7 @@ nextflow run bio-raum/FooDMe2 \
   -r 1.3.0 \
   --run_name validation \
   --input $HOME/metabarcoding/rawdata/samples.tsv \
-  --primer_set amniotes_dobrovolny \
+  --primer_set 16S_ILM_ASU184_meat \
   --outdir $HOME/metabarcoding/results/validation \
   --ground_truth $HOME/metabarcoding/dobrovolny_benchmark_groundtruth.csv
 ```
@@ -977,7 +977,7 @@ nextflow run bio-raum/FooDMe2 \
   -r 1.3.0 \
   --run_name validation \
   --input $HOME/metabarcoding/rawdata/samples.tsv \
-  --primer_set amniotes_dobrovolny \
+  --primer_set 16S_ILM_ASU184_meat \
   --reference_base $HOME/nextflow/refs \
   --outdir $HOME/metabarcoding/results/validation \
   --ground_truth $HOME/metabarcoding/dobrovolny_benchmark_groundtruth.csv
